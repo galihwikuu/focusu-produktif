@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FocusU — Produktivitas Mahasiswa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<!-- AUTH -->
+<div id="auth-page">
+  <div class="auth-box">
+    <div class="auth-logo"><h1>FocusU</h1><p>Produktivitas mahasiswa, terorganisir 🎓</p></div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Masuk</button>
+        <button class="auth-tab" onclick="switchTab('register')">Daftar</button>
+      </div>
+      <div id="error-msg" class="error-msg"></div>
+      <div id="login-form">
+        <div class="form-group"><label>username</label><input type="email" id="login-email" placeholder="galihwikuu" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
+        <p class="admin-hint">Admin: admin / admin123</p>
+      </div>
+      <div id="register-form" style="display:none">
+        <div class="form-group"><label>Nama Lengkap</label><input type="text" id="reg-name" placeholder="Nama kamu"></div>
+        <div class="form-group"><label>username</label><input type="email" id="reg-email" placeholder="galihwikuu "></div>
+        <div class="form-group"><label>Password</label><input type="password" id="reg-password" placeholder="Min. 6 karakter"></div>
+        <button class="btn btn-primary" onclick="doRegister()">Buat Akun</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-page">
+  <div class="sidebar">
+    <div class="sidebar-logo">FocusU</div>
+    <div id="user-nav">
+      <div class="sidebar-label">Fitur</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+      </div>
+      <div class="nav-item" id="nav-notes" onclick="showPage('notes')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Catatan
+      </div>
+      <div class="nav-item" id="nav-todos" onclick="showPage('todos')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>To-Do List
+      </div>
+      <div class="nav-item" id="nav-schedule" onclick="showPage('schedule')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Jadwal Kuliah
+      </div>
+      <div class="nav-item" id="nav-deadlines" onclick="showPage('deadlines')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Deadline
+      </div>
+      <div class="nav-item" id="nav-finance" onclick="showPage('finance')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Keuangan
+      </div>
+    </div>
+    <div id="admin-nav" style="display:none">
+      <div class="sidebar-label">Admin Panel</div>
+      <div class="nav-item" id="nav-admin-overview" onclick="showPage('admin-overview')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Overview<span class="nav-badge">Admin</span>
+      </div>
+      <div class="nav-item" id="nav-admin-users" onclick="showPage('admin-users')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Kelola User
+      </div>
+      <div class="nav-item" id="nav-admin-tasks" onclick="showPage('admin-tasks')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Semua Tugas
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-avatar"></div>
+        <div><div class="user-name" id="sidebar-name"></div><div class="user-role" id="sidebar-role"></div></div>
+      </div>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:8px" onclick="doLogout()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <!-- Topbar -->
+    <div class="topbar">
+      <div class="mobile-logo">FocusU</div>
+      <div class="profile-btn" id="profile-btn" onclick="toggleDropdown()">
+        <div class="profile-avatar" id="topbar-avatar"></div>
+        <span class="profile-name" id="topbar-name"></span>
+        <svg class="profile-chevron" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="profile-dropdown" id="profile-dropdown">
+          <div class="dropdown-user">
+            <div class="dropdown-user-name" id="dd-name"></div>
+            <div class="dropdown-user-email" id="dd-email">—</div>
+          </div>
+          <div class="dropdown-item" onclick="openProfileModal()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profil Saya
+          </div>
+          <div class="dropdown-item" onclick="openSettingsModal()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Pengaturan
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="doLogout()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Keluar
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="page-header">
+        <div><div class="page-title" id="greeting-title">Dashboard</div><div class="page-sub" id="greeting-sub">Semangat!</div></div>
+      </div>
+      <div class="stats-grid stats-3">
+        <div class="stat-card c1"><div class="stat-label">Total Tugas</div><div class="stat-value" id="d-total">0</div></div>
+        <div class="stat-card c4"><div class="stat-label">Selesai</div><div class="stat-value" id="d-done">0</div></div>
+        <div class="stat-card c6"><div class="stat-label">Deadline Aktif</div><div class="stat-value" id="d-dl">0</div></div>
+        <div class="stat-card c2"><div class="stat-label">To-Do Aktif</div><div class="stat-value" id="d-todos">0</div></div>
+        <div class="stat-card c3"><div class="stat-label">Catatan</div><div class="stat-value" id="d-notes">0</div></div>
+      </div>
+      <div class="today-schedule" id="today-box">
+        <h3>📅 Kuliah Hari Ini <span id="today-day-name"></span></h3>
+        <div id="today-list"><div style="color:var(--muted);font-size:.85rem">Memuat...</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="chart-card">
+          <h3>Deadline Mendekat</h3>
+          <div id="upcoming-deadlines-box"></div>
+        </div>
+        <div class="chart-card">
+          <h3>Keuangan Bulan Ini</h3>
+          <div style="display:flex;gap:16px;margin-bottom:12px">
+            <div><div style="font-size:.72rem;color:var(--muted)">PEMASUKAN</div><div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--green)" id="d-income">Rp0</div></div>
+            <div><div style="font-size:.72rem;color:var(--muted)">PENGELUARAN</div><div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--red)" id="d-expense">Rp0</div></div>
+          </div>
+          <div class="chart-wrap" style="height:160px"><canvas id="dash-finance-chart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="page" id="page-notes">
+      <div class="page-header">
+        <div><div class="page-title">📝 Catatan</div><div class="page-sub">Catatan pribadimu — hanya kamu yang bisa lihat</div></div>
+        <button class="add-btn" onclick="openNoteModal()">+ Catatan Baru</button>
+      </div>
+      <div class="filter-row">
+        <input type="text" id="note-search" placeholder="🔍 Cari catatan..." oninput="renderNotes()"
+          style="padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;width:260px">
+      </div>
+      <div class="tasks-grid" id="notes-container"></div>
+    </div>
+
+    <!-- TODOS -->
+    <div class="page" id="page-todos">
+      <div class="page-header">
+        <div><div class="page-title">To-Do List</div><div class="page-sub">Checklist harian simpel</div></div>
+        <button class="clear-done-btn" onclick="clearDoneTodos()">Hapus yang selesai</button>
+      </div>
+      <div class="todo-container">
+        <div class="todo-input-row">
+          <input type="text" id="todo-input" placeholder="Tambah to-do baru... (Enter)" onkeydown="if(event.key==='Enter')addTodo()">
+          <button onclick="addTodo()">+ Tambah</button>
+        </div>
+        <div class="todo-progress" id="todo-prog-box" style="display:none">
+          <div class="todo-progress-bar"><div class="todo-progress-fill" id="todo-bar" style="width:0%"></div></div>
+          <div class="todo-progress-text" id="todo-prog-text">0 / 0</div>
+        </div>
+        <div class="filter-group" style="margin-bottom:14px">
+          <button class="filter-btn active" onclick="setTodoFilter('all',this)">Semua</button>
+          <button class="filter-btn" onclick="setTodoFilter('active',this)">Aktif</button>
+          <button class="filter-btn" onclick="setTodoFilter('done',this)">Selesai</button>
+        </div>
+        <div class="todo-list" id="todo-list"></div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div class="page" id="page-schedule">
+      <div class="page-header">
+        <div><div class="page-title">Jadwal Kuliah</div><div class="page-sub">Atur jadwal per harimu</div></div>
+        <button class="add-btn" onclick="openScheduleModal()">+ Tambah Jadwal</button>
+      </div>
+      <div id="schedule-container"></div>
+    </div>
+
+    <!-- DEADLINES -->
+    <div class="page" id="page-deadlines">
+      <div class="page-header">
+        <div><div class="page-title">⏰ Deadline</div><div class="page-sub">Pantau semua tenggat waktu penting</div></div>
+        <button class="add-btn" onclick="openDeadlineModal()">+ Deadline Baru</button>
+      </div>
+      <div class="stats-grid stats-4" style="margin-bottom:20px">
+        <div class="stat-card c1"><div class="stat-label">Total</div><div class="stat-value" id="dl-total">0</div></div>
+        <div class="stat-card c6"><div class="stat-label">Terlewat</div><div class="stat-value" id="dl-overdue">0</div></div>
+        <div class="stat-card c5"><div class="stat-label">Minggu Ini</div><div class="stat-value" id="dl-week">0</div></div>
+        <div class="stat-card c4"><div class="stat-label">Selesai</div><div class="stat-value" id="dl-done">0</div></div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="setDlFilter('all',this)">Semua</button>
+          <button class="filter-btn" onclick="setDlFilter('active',this)">Aktif</button>
+          <button class="filter-btn" onclick="setDlFilter('overdue',this)">Terlewat</button>
+          <button class="filter-btn" onclick="setDlFilter('completed',this)">Selesai</button>
+        </div>
+      </div>
+      <div class="tasks-grid" id="deadlines-container"></div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="page" id="page-finance">
+      <div class="page-header">
+        <div><div class="page-title">💰 Laporan Keuangan</div><div class="page-sub">Catat pemasukan dan pengeluaran</div></div>
+        <button class="add-btn" onclick="openFinanceModal()">+ Tambah Transaksi</button>
+      </div>
+      <div class="finance-summary-bar">
+        <div class="finance-summary-item">
+          <div class="finance-summary-icon" style="background:rgba(52,211,153,.15)">💰</div>
+          <div>
+            <div class="finance-summary-label">Pemasukan</div>
+            <div class="finance-summary-value income" id="f-income">Rp0</div>
+          </div>
+        </div>
+        <div class="finance-summary-divider"></div>
+        <div class="finance-summary-item">
+          <div class="finance-summary-icon" style="background:rgba(248,113,113,.12)">💸</div>
+          <div>
+            <div class="finance-summary-label">Pengeluaran</div>
+            <div class="finance-summary-value expense" id="f-expense">Rp0</div>
+          </div>
+        </div>
+        <div class="finance-summary-divider"></div>
+        <div class="finance-summary-item">
+          <div class="finance-summary-icon" style="background:rgba(124,92,252,.15)">💳</div>
+          <div>
+            <div class="finance-summary-label">Saldo</div>
+            <div class="finance-summary-value" id="f-balance">Rp0</div>
+          </div>
+        </div>
+      </div>
+      <div class="finance-layout">
+        <div class="finance-left">
+          <div class="chart-card">
+            <h3>Grafik Bulanan <div class="month-selector"><select id="finance-year" onchange="loadFinanceSummary()"></select></div></h3>
+            <div class="chart-wrap"><canvas id="monthly-chart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Pengeluaran per Kategori</h3>
+            <div class="chart-wrap" style="height:200px"><canvas id="category-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="finance-right">
+        <div class="chart-card">
+          <h3>Riwayat Transaksi</h3>
+          <div class="tx-month-filter">
+            <button class="tx-month-btn active" onclick="setTxMonth('',this)">Semua</button>
+            <button class="tx-month-btn" onclick="setTxMonth('01',this)">Jan</button>
+            <button class="tx-month-btn" onclick="setTxMonth('02',this)">Feb</button>
+            <button class="tx-month-btn" onclick="setTxMonth('03',this)">Mar</button>
+            <button class="tx-month-btn" onclick="setTxMonth('04',this)">Apr</button>
+            <button class="tx-month-btn" onclick="setTxMonth('05',this)">Mei</button>
+            <button class="tx-month-btn" onclick="setTxMonth('06',this)">Jun</button>
+            <button class="tx-month-btn" onclick="setTxMonth('07',this)">Jul</button>
+            <button class="tx-month-btn" onclick="setTxMonth('08',this)">Agu</button>
+            <button class="tx-month-btn" onclick="setTxMonth('09',this)">Sep</button>
+            <button class="tx-month-btn" onclick="setTxMonth('10',this)">Okt</button>
+            <button class="tx-month-btn" onclick="setTxMonth('11',this)">Nov</button>
+            <button class="tx-month-btn" onclick="setTxMonth('12',this)">Des</button>
+          </div>
+          <div class="tx-list" id="tx-list"></div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN OVERVIEW -->
+    <div class="page" id="page-admin-overview">
+      <div class="page-header">
+        <div><div class="page-title">🛡 Admin Overview</div><div class="page-sub">Statistik keseluruhan aplikasi</div></div>
+        <button class="add-btn admin" onclick="loadAdminStats()">↻ Refresh</button>
+      </div>
+      <div class="stats-grid stats-6">
+        <div class="stat-card c1"><div class="stat-label">Total User</div><div class="stat-value" id="a-users">-</div></div>
+        <div class="stat-card c2"><div class="stat-label">Total Tugas</div><div class="stat-value" id="a-tasks">-</div></div>
+        <div class="stat-card c4"><div class="stat-label">Selesai</div><div class="stat-value" id="a-done">-</div></div>
+        <div class="stat-card c3"><div class="stat-label">Berjalan</div><div class="stat-value" id="a-prog">-</div></div>
+        <div class="stat-card c5"><div class="stat-label">Belum Mulai</div><div class="stat-value" id="a-todo">-</div></div>
+        <div class="stat-card c6"><div class="stat-label">User Baru (7 hari)</div><div class="stat-value" id="a-new">-</div></div>
+      </div>
+    </div>
+
+    <!-- ADMIN USERS -->
+    <div class="page" id="page-admin-users">
+      <div class="page-header">
+        <div><div class="page-title">👥 Kelola User</div><div class="page-sub">Daftar semua pengguna</div></div>
+        <button class="add-btn admin" onclick="loadAdminUsers()">↻ Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-ttl">Semua User</div><div class="table-cnt" id="u-count">-</div></div>
+        <table><thead><tr><th>Nama</th><th>username</th><th>Tugas</th><th>Bergabung</th><th>Aksi</th></tr></thead>
+        <tbody id="users-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:36px">Memuat...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- ADMIN TASKS -->
+    <div class="page" id="page-admin-tasks">
+      <div class="page-header">
+        <div><div class="page-title">📋 Semua Tugas</div><div class="page-sub">Tugas dari seluruh pengguna</div></div>
+        <button class="add-btn admin" onclick="loadAdminTasks()">↻ Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-hdr"><div class="table-ttl">Semua Tugas</div><div class="table-cnt" id="at-count">-</div></div>
+        <table><thead><tr><th>Judul</th><th>User</th><th>Prioritas</th><th>Status</th><th>Dibuat</th><th>Aksi</th></tr></thead>
+        <tbody id="all-tasks-body"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:36px">Memuat...</td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MODALS -->
+<!-- Task Modal -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="task-modal-ttl">Tugas Baru</div><button class="close-btn" onclick="closeModal('task-modal')">✕</button></div>
+    <input type="hidden" id="task-edit-id">
+    <div class="form-group"><label>Judul *</label><input type="text" id="task-title" placeholder="Apa yang perlu dikerjakan?"></div>
+    <div class="form-group"><label>Deskripsi</label><textarea id="task-desc" placeholder="Detail tambahan..."></textarea></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Prioritas</label><select id="task-priority"><option value="low">Rendah</option><option value="medium" selected>Sedang</option><option value="high">Tinggi</option></select></div>
+      <div class="form-group"><label>Status</label><select id="task-status"><option value="todo">Belum Mulai</option><option value="in_progress">Sedang Berjalan</option><option value="done">Selesai</option></select></div>
+    </div>
+    <div class="form-group"><label>Tenggat Waktu</label><input type="date" id="task-due"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('task-modal')">Batal</button><button class="btn btn-primary" onclick="saveTask()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- Schedule Modal -->
+<div class="modal-overlay" id="schedule-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="sch-modal-ttl">Tambah Jadwal</div><button class="close-btn" onclick="closeModal('schedule-modal')">✕</button></div>
+    <input type="hidden" id="sch-edit-id">
+    <div class="form-group"><label>Mata Kuliah *</label><input type="text" id="sch-subject" placeholder="Nama mata kuliah"></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Hari *</label><select id="sch-day"><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option></select></div>
+      <div class="form-group"><label>Warna</label><div class="color-picker-row" id="color-picker"></div></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Jam Mulai *</label><input type="time" id="sch-start"></div>
+      <div class="form-group"><label>Jam Selesai *</label><input type="time" id="sch-end"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Dosen</label><input type="text" id="sch-lecturer" placeholder="Nama dosen"></div>
+      <div class="form-group"><label>Ruangan</label><input type="text" id="sch-room" placeholder="Gedung/Ruang"></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('schedule-modal')">Batal</button><button class="btn btn-primary" onclick="saveSchedule()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- Deadline Modal -->
+<div class="modal-overlay" id="deadline-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="dl-modal-ttl">Deadline Baru</div><button class="close-btn" onclick="closeModal('deadline-modal')">✕</button></div>
+    <input type="hidden" id="dl-edit-id">
+    <div class="form-group"><label>Judul *</label><input type="text" id="dl-title" placeholder="Nama tugas/event"></div>
+    <div class="form-group"><label>Deskripsi</label><textarea id="dl-desc" placeholder="Keterangan tambahan..."></textarea></div>
+    <div class="form-row form-row-3">
+      <div class="form-group"><label>Tanggal *</label><input type="date" id="dl-date"></div>
+      <div class="form-group"><label>Kategori</label><select id="dl-category"><option>Kuliah</option><option>UTS/UAS</option><option>Tugas</option><option>Project</option><option>Organisasi</option><option>Umum</option></select></div>
+      <div class="form-group"><label>Prioritas</label><select id="dl-priority"><option value="low">Rendah</option><option value="medium" selected>Sedang</option><option value="high">Tinggi</option></select></div>
+    </div>
+    <div class="form-group"><label>Status</label><select id="dl-status"><option value="active">Aktif</option><option value="completed">Selesai</option></select></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('deadline-modal')">Batal</button><button class="btn btn-primary" onclick="saveDeadline()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- Finance Modal -->
+<div class="modal-overlay" id="finance-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl">Tambah Transaksi</div><button class="close-btn" onclick="closeModal('finance-modal')">✕</button></div>
+    <div class="form-group"><label>Tipe *</label>
+      <div class="filter-group" style="width:100%;margin-bottom:0">
+        <button class="filter-btn active" id="type-income-btn" onclick="setFinanceType('income',this)" style="flex:1">💰 Pemasukan</button>
+        <button class="filter-btn" id="type-expense-btn" onclick="setFinanceType('expense',this)" style="flex:1">💸 Pengeluaran</button>
+      </div>
+      <input type="hidden" id="fin-type" value="income">
+    </div>
+    <div class="form-group"><label>Jumlah (Rp) *</label><input type="number" id="fin-amount" placeholder="0" min="0"></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label>Kategori</label>
+        <select id="fin-category">
+          <option>Uang Saku</option><option>Gaji/Freelance</option><option>Beasiswa</option>
+          <option>Makan & Minum</option><option>Transportasi</option><option>Pendidikan</option>
+          <option>Hiburan</option><option>Belanja</option><option>Kesehatan</option><option>Lainnya</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Tanggal *</label><input type="date" id="fin-date"></div>
+    </div>
+    <div class="form-group"><label>Keterangan</label><input type="text" id="fin-desc" placeholder="Catatan transaksi..."></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('finance-modal')">Batal</button><button class="btn btn-primary" onclick="saveFinance()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hdr">
+      <div class="modal-ttl" id="note-modal-ttl">Catatan Baru</div>
+      <button class="close-btn" onclick="closeModal('note-modal')">✕</button>
+    </div>
+    <input type="hidden" id="note-edit-id">
+    <div class="form-group"><label>Judul *</label><input type="text" id="note-title" placeholder="Judul catatan..."></div>
+    <div class="form-group"><label>Isi Catatan</label><textarea id="note-content" placeholder="Tulis catatanmu di sini..." style="min-height:180px"></textarea></div>
+    <div class="form-group"><label>Warna Label</label><div class="color-picker-row" id="note-color-picker"></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('note-modal')">Batal</button>
+      <button class="btn btn-primary" onclick="saveNote()">Simpan</button>
+    </div>
+  </div>
+</div>
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hdr">
+      <div class="modal-ttl">Profil Saya</div>
+      <button class="close-btn" onclick="closeModal('profile-modal')">✕</button>
+    </div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="profile-modal-avatar" id="pm-avatar"></div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700" id="pm-name"></div>
+      <div style="font-size:.8rem;color:var(--muted);margin-top:4px" id="pm-role"></div>
+    </div>
+    <div class="profile-info-box">
+      <div class="profile-info-row">
+        <span class="profile-info-label">Nama</span>
+        <span id="pm-info-name" style="font-weight:500">—</span>
+      </div>
+      <div class="profile-info-row">
+        <span class="profile-info-label">Email</span>
+        <span id="pm-info-email" style="font-size:.82rem">—</span>
+      </div>
+      <div class="profile-info-row">
+        <span class="profile-info-label">Role</span>
+        <span id="pm-info-role">—</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Ganti Password</label>
+      <input type="password" id="pm-old-pass" placeholder="Password lama">
+    </div>
+    <div class="form-group">
+      <input type="password" id="pm-new-pass" placeholder="Password baru (min. 6 karakter)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('profile-modal')">Tutup</button>
+      <button class="btn btn-primary" onclick="changePassword()">Simpan Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hdr">
+      <div class="modal-ttl">⚙️ Pengaturan</div>
+      <button class="close-btn" onclick="closeModal('settings-modal')">✕</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Tampilan</div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:rgba(124,92,252,.15)">🌙</div>
+          <div>
+            <div class="settings-item-title">Mode Gelap</div>
+            <div class="settings-item-sub">Tema gelap aktif secara default</div>
+          </div>
+        </div>
+        <div class="toggle-switch on" id="dark-toggle" onclick="toggleDarkMode()"></div>
+      </div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:rgba(52,211,153,.15)">🔔</div>
+          <div>
+            <div class="settings-item-title">Notifikasi Deadline</div>
+            <div class="settings-item-sub">Ingatkan deadline yang mendekat</div>
+          </div>
+        </div>
+        <div class="toggle-switch" id="notif-toggle" onclick="toggleSetting('notif-toggle','notif')"></div>
+      </div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:rgba(251,191,36,.15)">🔄</div>
+          <div>
+            <div class="settings-item-title">Auto Refresh Dashboard</div>
+            <div class="settings-item-sub">Refresh data setiap 30 detik</div>
+          </div>
+        </div>
+        <div class="toggle-switch" id="refresh-toggle" onclick="toggleSetting('refresh-toggle','autorefresh')"></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Akun</div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:rgba(248,113,113,.12)">🗑</div>
+          <div>
+            <div class="settings-item-title">Hapus Semua To-Do Selesai</div>
+            <div class="settings-item-sub">Bersihkan checklist yang sudah done</div>
+          </div>
+        </div>
+        <button class="change-pass-btn" onclick="clearDoneTodos();closeModal('settings-modal')">Hapus</button>
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="closeModal('settings-modal')">Tutup</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ── STATE ──
+let currentUser=null,allTasks=[],allTodos=[],allSchedules=[],allDeadlines=[],allTransactions=[];
+let statusFilter='all',prioFilter='all',todoFilter='all',dlFilter='all',selectedColor='#7c5cfc',financeType='income';
+let monthlyChart=null,categoryChart=null,dashFinanceChart=null;
+const COLORS=['#7c5cfc','#c084fc','#60a5fa','#34d399','#fbbf24','#f87171','#fb923c','#f472b6'];
+const DAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+const TODAY_DAYS=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const MONTHS=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+// ── UTILS ──
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3000)}
+function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block'}
+function clearError(){document.getElementById('error-msg').style.display='none'}
+async function api(url,opts={}){const res=await fetch(url,{headers:{'Content-Type':'application/json'},...opts,body:opts.body?JSON.stringify(opts.body):undefined});return res.json()}
+function fmtDate(s){if(!s)return'-';return new Date(s).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}
+function fmtTime(t){if(!t)return'';return t.substring(0,5)}
+function fmtRp(n){return'Rp'+Math.abs(n||0).toLocaleString('id-ID')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function getDaysUntil(dateStr){const d=new Date(dateStr);d.setHours(23,59,59);return Math.ceil((d-new Date())/86400000)}
+
+// ── AUTH ──
+function switchTab(tab){clearError();document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));document.getElementById('login-form').style.display=tab==='login'?'':'none';document.getElementById('register-form').style.display=tab==='register'?'':'none'}
+async function doLogin(){clearError();const email=document.getElementById('login-email').value,password=document.getElementById('login-password').value;if(!email||!password)return showError('Isi semua field!');const d=await api('/api/auth/login',{method:'POST',body:{email,password}});if(d.success)enterApp(d.user);else showError(d.message)}
+async function doRegister(){clearError();const name=document.getElementById('reg-name').value,email=document.getElementById('reg-email').value,password=document.getElementById('reg-password').value;if(!name||!email||!password)return showError('Isi semua field!');if(password.length<6)return showError('Password minimal 6 karakter');const d=await api('/api/auth/register',{method:'POST',body:{name,email,password}});if(d.success)enterApp(d.user);else showError(d.message)}
+async function doLogout(){stopAutoRefresh();await api('/api/auth/logout',{method:'POST'});document.getElementById('app-page').style.display='none';document.getElementById('auth-page').style.display='flex';currentUser=null}
+
+function enterApp(user){
+  currentUser=user;
+  document.getElementById('auth-page').style.display='none';
+  document.getElementById('app-page').style.display='block';
+  document.getElementById('sidebar-name').textContent=user.name;
+
+  // Topbar profile
+  const topAvatar = document.getElementById('topbar-avatar');
+  const topName = document.getElementById('topbar-name');
+  const ddName = document.getElementById('dd-name');
+  if (topAvatar) {
+    topAvatar.textContent = user.name[0].toUpperCase();
+    topAvatar.className = `profile-avatar ${user.role === 'admin' ? 'admin-av' : ''}`;
+  }
+  if (topName) topName.textContent = user.name;
+  if (ddName) ddName.textContent = user.name;
+
+  const av = document.getElementById('sidebar-avatar');
+  av.textContent = user.name[0].toUpperCase();
+
+  const userNav = document.getElementById('user-nav');
+  const adminNav = document.getElementById('admin-nav');
+
+  if(user.role === 'admin'){
+    document.getElementById('sidebar-role').textContent = '⭐ Administrator';
+    av.className = 'user-avatar admin-av';
+
+    // sembunyikan user nav, tampilkan admin nav
+    userNav.style.display = 'none';
+    userNav.classList.remove('show-mobile');
+    adminNav.style.display = 'block';
+    adminNav.classList.add('show-mobile');
+
+    showPage('admin-overview');
+    loadAdminStats();
+  } else {
+    document.getElementById('sidebar-role').textContent = 'Mahasiswa';
+
+    // sembunyikan admin nav, tampilkan user nav
+    userNav.style.display = 'block';
+    userNav.classList.add('show-mobile');
+    adminNav.style.display = 'none';
+    adminNav.classList.remove('show-mobile');
+
+    const h = new Date().getHours();
+    const s = h<12 ? 'Selamat pagi' : h<15 ? 'Selamat siang' : h<18 ? 'Selamat sore' : 'Selamat malam';
+    document.getElementById('greeting-title').textContent = `${s}, ${user.name}! 👋`;
+    document.getElementById('greeting-sub').textContent = 'Semangat belajar hari ini!';
+
+    showPage('dashboard');
+    loadDashboard();
+    startAutoRefresh();
+  }
+}
+
+// ── PAGES ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    // reset transform
+    n.style.transform = '';
+  });
+  const el = document.getElementById('nav-' + name) || document.getElementById('nav-admin-' + name.replace('admin-', ''));
+  if (el) {
+    el.classList.add('active');
+  }
+  if(name==='dashboard') loadDashboard();
+  if(name==='tasks') loadTasks();
+  if(name==='todos') loadTodos();
+  if(name==='schedule') loadSchedule();
+  if(name==='deadlines') loadDeadlines();
+  if(name==='finance'){loadFinanceSummary();loadTransactions();}
+  if(name==='admin-users') loadAdminUsers();
+  if(name==='admin-tasks') loadAdminTasks();
+  if(name==='notes') loadNotes();
+}
+
+
+
+// ── DASHBOARD ──
+async function loadDashboard(){
+  const [taskStat, todoData, schData, dlData, finData, noteData] = await Promise.all([
+    api('/api/tasks/stats'),
+    api('/api/todos'),
+    api('/api/schedules'),
+    api('/api/deadlines'),
+    api('/api/finance/summary?year=' + new Date().getFullYear()),
+    api('/api/notes')
+  ]);
+  if(taskStat.success){
+    const s=taskStat.stats;
+    document.getElementById('d-total').textContent=s.total||0;
+    document.getElementById('d-done').textContent=s.done||0;
+  }
+  if(todoData.success){
+    allTodos=todoData.todos;
+    document.getElementById('d-todos').textContent=allTodos.filter(t=>!t.done).length;
+  }
+  if(schData.success){allSchedules=schData.schedules;renderTodaySchedule()}
+  if(dlData.success){
+    allDeadlines=dlData.deadlines;
+    const active=allDeadlines.filter(d=>d.status==='active').length;
+    document.getElementById('d-dl').textContent=active;
+    renderUpcomingDeadlines();
+  }
+  if(finData.success){
+    const t=finData.totals;
+    const inc=t.total_income||0, exp=t.total_expense||0;
+    document.getElementById('d-income').textContent=fmtRp(inc);
+    document.getElementById('d-expense').textContent=fmtRp(exp);
+    renderDashFinanceChart(finData.monthly);
+  }
+  if(noteData.success){
+    allNotes=noteData.notes;
+    const noteEl=document.getElementById('d-notes');
+    if(noteEl) noteEl.textContent=allNotes.length;
+  }
+}
+
+function renderTodaySchedule(){
+  const todayName=TODAY_DAYS[new Date().getDay()];
+  document.getElementById('today-day-name').innerHTML=`<span class="today-badge-sm">📍 ${todayName}</span>`;
+  const todays=allSchedules.filter(s=>s.day===todayName);
+  const c=document.getElementById('today-list');
+  if(!todays.length){c.innerHTML='<div style="color:var(--muted);font-size:.85rem">Tidak ada kuliah hari ini 🎉</div>';return}
+  c.innerHTML=todays.map(s=>`<div class="today-item"><div class="today-dot" style="background:${s.color||'#7c5cfc'}"></div><div class="today-info"><div class="today-subj">${s.subject}</div><div class="today-detail">${s.lecturer?s.lecturer+' · ':''}${s.room||'Ruang TBD'}</div></div><div class="today-time-badge">${fmtTime(s.start_time)} – ${fmtTime(s.end_time)}</div></div>`).join('');
+}
+
+function renderUpcomingDeadlines(){
+  const box=document.getElementById('upcoming-deadlines-box');
+  const upcoming=allDeadlines.filter(d=>d.status==='active').slice(0,4);
+  if(!upcoming.length){box.innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:20px">Tidak ada deadline aktif 🎉</div>';return}
+  box.innerHTML=upcoming.map(d=>{
+    const days=getDaysUntil(d.due_date);
+    const cls=days<0?'urgency-overdue':days<=3?'urgency-soon':days<=7?'urgency-upcoming':'urgency-far';
+    const label=days<0?`${Math.abs(days)} hari lalu`:days===0?'Hari ini!':days===1?'Besok':`${days} hari lagi`;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="${cls}" style="font-weight:700;font-size:.82rem;min-width:80px">${label}</div>
+      <div style="flex:1"><div style="font-size:.85rem;font-weight:500">${d.title}</div><div style="font-size:.72rem;color:var(--muted)">${d.category}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashFinanceChart(monthly){
+  if(dashFinanceChart){dashFinanceChart.destroy();dashFinanceChart=null}
+  const ctx=document.getElementById('dash-finance-chart').getContext('2d');
+  const labels=monthly.map(m=>MONTHS[parseInt(m.month)-1]);
+  const incomes=monthly.map(m=>m.income||0);
+  const expenses=monthly.map(m=>m.expense||0);
+  dashFinanceChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[
+    {label:'Pemasukan',data:incomes,backgroundColor:'rgba(52,211,153,.6)',borderRadius:4},
+    {label:'Pengeluaran',data:expenses,backgroundColor:'rgba(248,113,113,.6)',borderRadius:4}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#6b6b80',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#6b6b80',font:{size:10},callback:v=>'Rp'+v.toLocaleString('id-ID')},grid:{color:'rgba(255,255,255,.04)'}}}}});
+}
+
+// ── TASKS ──
+async function loadTasks(){
+  const[tData,sData]=await Promise.all([api('/api/tasks'),api('/api/tasks/stats')]);
+  if(tData.success)allTasks=tData.tasks;
+  if(sData.success){const s=sData.stats;document.getElementById('t-total').textContent=s.total||0;document.getElementById('t-todo').textContent=s.todo||0;document.getElementById('t-prog').textContent=s.in_progress||0;document.getElementById('t-done').textContent=s.done||0}
+  renderTasks();
+}
+function renderTasks(){
+  let tasks=[...allTasks];
+  if(statusFilter!=='all')tasks=tasks.filter(t=>t.status===statusFilter);
+  if(prioFilter!=='all')tasks=tasks.filter(t=>t.priority===prioFilter);
+  const c=document.getElementById('tasks-container');
+  if(!tasks.length){c.innerHTML='<div class="empty-state"><h3>Tidak ada tugas</h3><p>Klik "+ Tugas Baru" untuk mulai</p></div>';return}
+  const pl={low:'Rendah',medium:'Sedang',high:'Tinggi'},sl={todo:'Belum Mulai',in_progress:'Berjalan',done:'Selesai'};
+  c.innerHTML=tasks.map(t=>{
+    const over=t.due_date&&new Date(t.due_date)<new Date()&&t.status!=='done';
+    const dueStr=t.due_date?new Date(t.due_date).toLocaleDateString('id-ID',{day:'numeric',month:'short'}):'';
+    return`<div class="task-card"><div class="task-top"><div class="task-title ${t.status==='done'?'done-txt':''}">${t.title}</div><div class="task-acts"><button class="act-btn act-edit" onclick="openTaskModal(${t.id})">✏️</button><button class="act-btn act-del" onclick="deleteTask(${t.id})">🗑</button></div></div>${t.description?`<div class="task-desc">${t.description}</div>`:''}<div class="task-meta"><span class="badge p-${t.priority}">${pl[t.priority]}</span><span class="badge s-${t.status}">${sl[t.status]}</span>${dueStr?`<span class="due ${over?'overdue':''}">📅 ${dueStr}${over?' · Terlambat':''}</span>`:''}</div></div>`;
+  }).join('');
+}
+function setStatusFilter(f,btn){statusFilter=f;btn.closest('.filter-group').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTasks()}
+function setPrioFilter(f,btn){prioFilter=f;btn.closest('.filter-group').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTasks()}
+function openTaskModal(id){
+  document.getElementById('task-modal-ttl').textContent=id?'Edit Tugas':'Tugas Baru';
+  document.getElementById('task-edit-id').value=id||'';
+  if(id){const t=allTasks.find(x=>x.id===id);if(t){document.getElementById('task-title').value=t.title;document.getElementById('task-desc').value=t.description||'';document.getElementById('task-priority').value=t.priority;document.getElementById('task-status').value=t.status;document.getElementById('task-due').value=t.due_date||''}}
+  else{document.getElementById('task-title').value='';document.getElementById('task-desc').value='';document.getElementById('task-priority').value='medium';document.getElementById('task-status').value='todo';document.getElementById('task-due').value=''}
+  document.getElementById('task-modal').classList.add('open');
+}
+async function saveTask(){
+  const id=document.getElementById('task-edit-id').value;
+  const body={title:document.getElementById('task-title').value,description:document.getElementById('task-desc').value,priority:document.getElementById('task-priority').value,status:document.getElementById('task-status').value,due_date:document.getElementById('task-due').value||null};
+  if(!body.title)return showToast('Judul wajib diisi!','error');
+  const d=id?await api(`/api/tasks/${id}`,{method:'PUT',body}):await api('/api/tasks',{method:'POST',body});
+  if(d.success){closeModal('task-modal');showToast(id?'Tugas diperbarui!':'Tugas ditambahkan!');loadTasks()}else showToast(d.message,'error');
+}
+async function deleteTask(id){if(!confirm('Hapus tugas ini?'))return;const d=await api(`/api/tasks/${id}`,{method:'DELETE'});if(d.success){showToast('Tugas dihapus');loadTasks()}}
+
+// ── TODOS ──
+async function loadTodos(){const d=await api('/api/todos');if(d.success){allTodos=d.todos;renderTodos()}}
+function renderTodos(){
+  const total=allTodos.length,done=allTodos.filter(t=>t.done).length;
+  const pb=document.getElementById('todo-prog-box');
+  if(total>0){pb.style.display='flex';document.getElementById('todo-bar').style.width=`${Math.round(done/total*100)}%`;document.getElementById('todo-prog-text').textContent=`${done} / ${total} selesai`}else pb.style.display='none';
+  let todos=[...allTodos];
+  if(todoFilter==='active')todos=todos.filter(t=>!t.done);
+  if(todoFilter==='done')todos=todos.filter(t=>t.done);
+  const list=document.getElementById('todo-list');
+  if(!todos.length){list.innerHTML=`<div style="text-align:center;padding:50px 20px;color:var(--muted);font-size:.88rem">${todoFilter==='done'?'Belum ada yang selesai':'Tidak ada to-do aktif!'}</div>`;return}
+  list.innerHTML=todos.map(t=>`<div class="todo-item ${t.done?'done-item':''}"><div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${t.id})"></div><div class="todo-text ${t.done?'done-text':''}">${t.text}</div><div class="todo-time">${new Date(t.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</div><button class="todo-del" onclick="deleteTodo(${t.id})">✕</button></div>`).join('');
+}
+function setTodoFilter(f,btn){todoFilter=f;btn.closest('.filter-group').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTodos()}
+async function addTodo(){const inp=document.getElementById('todo-input'),text=inp.value.trim();if(!text)return;const d=await api('/api/todos',{method:'POST',body:{text}});if(d.success){inp.value='';allTodos.unshift(d.todo);renderTodos()}}
+async function toggleTodo(id){const d=await api(`/api/todos/${id}/toggle`,{method:'PUT'});if(d.success){const t=allTodos.find(x=>x.id===id);if(t)t.done=d.done;renderTodos()}}
+async function deleteTodo(id){const d=await api(`/api/todos/${id}`,{method:'DELETE'});if(d.success){allTodos=allTodos.filter(x=>x.id!==id);renderTodos()}}
+async function clearDoneTodos(){if(!allTodos.some(t=>t.done))return showToast('Tidak ada yang selesai','error');if(!confirm('Hapus semua yang sudah selesai?'))return;const d=await api('/api/todos/done/all',{method:'DELETE'});if(d.success){allTodos=allTodos.filter(t=>!t.done);renderTodos();showToast('Dibersihkan!')}}
+
+// ── SCHEDULE ──
+async function loadSchedule(){const d=await api('/api/schedules');if(d.success){allSchedules=d.schedules;renderSchedule()}}
+function renderSchedule(){
+  const todayName=TODAY_DAYS[new Date().getDay()];
+  const c=document.getElementById('schedule-container');
+  if(!allSchedules.length){c.innerHTML='<div class="no-schedule-msg"><p style="font-size:1.5rem;margin-bottom:10px">📅</p><p>Belum ada jadwal. Klik "+ Tambah Jadwal" untuk mulai!</p></div>';return}
+  let html='';
+  DAYS.forEach(day=>{
+    const items=allSchedules.filter(s=>s.day===day);if(!items.length)return;
+    const isToday=day===todayName;
+    html+=`<div class="schedule-day-header">${day}${isToday?'<span class="today-badge-sm">Hari Ini</span>':''}</div><div class="schedule-grid">`;
+    items.forEach(s=>{html+=`<div class="schedule-card"><div class="schedule-color-bar" style="background:${s.color||'#7c5cfc'}"></div><div class="schedule-body"><div class="schedule-time">${fmtTime(s.start_time)} – ${fmtTime(s.end_time)}</div><div class="schedule-subject">${s.subject}</div><div class="schedule-meta">${s.lecturer?`<span>${s.lecturer}</span>`:''}${s.room?`<span>📍 ${s.room}</span>`:''}</div><div class="schedule-acts"><button class="act-btn act-edit" onclick="openScheduleModal(${s.id})">✏️</button><button class="act-btn act-del" onclick="deleteSchedule(${s.id})">🗑</button></div></div></div>`});
+    html+='</div>';
+  });
+  c.innerHTML=html;
+}
+function buildColorPicker(sel){const cp=document.getElementById('color-picker');cp.innerHTML=COLORS.map(c=>`<div class="color-dot ${c===sel?'selected':''}" style="background:${c}" onclick="selectColor('${c}',this)"></div>`).join('');selectedColor=sel}
+function selectColor(color,el){selectedColor=color;document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('selected'));el.classList.add('selected')}
+function openScheduleModal(id){
+  document.getElementById('sch-modal-ttl').textContent=id?'Edit Jadwal':'Tambah Jadwal';
+  document.getElementById('sch-edit-id').value=id||'';
+  if(id){const s=allSchedules.find(x=>x.id===id);if(s){document.getElementById('sch-subject').value=s.subject;document.getElementById('sch-day').value=s.day;document.getElementById('sch-start').value=s.start_time;document.getElementById('sch-end').value=s.end_time;document.getElementById('sch-lecturer').value=s.lecturer||'';document.getElementById('sch-room').value=s.room||'';buildColorPicker(s.color||'#7c5cfc')}}
+  else{document.getElementById('sch-subject').value='';document.getElementById('sch-day').value='Senin';document.getElementById('sch-start').value='08:00';document.getElementById('sch-end').value='10:00';document.getElementById('sch-lecturer').value='';document.getElementById('sch-room').value='';buildColorPicker('#7c5cfc')}
+  document.getElementById('schedule-modal').classList.add('open');
+}
+async function saveSchedule(){
+  const id=document.getElementById('sch-edit-id').value;
+  const body={subject:document.getElementById('sch-subject').value,day:document.getElementById('sch-day').value,start_time:document.getElementById('sch-start').value,end_time:document.getElementById('sch-end').value,lecturer:document.getElementById('sch-lecturer').value,room:document.getElementById('sch-room').value,color:selectedColor};
+  if(!body.subject||!body.start_time)return showToast('Mata kuliah dan jam wajib!','error');
+  const d=id?await api(`/api/schedules/${id}`,{method:'PUT',body}):await api('/api/schedules',{method:'POST',body});
+  if(d.success){closeModal('schedule-modal');showToast(id?'Jadwal diperbarui!':'Jadwal ditambahkan!');loadSchedule()}else showToast(d.message,'error');
+}
+async function deleteSchedule(id){if(!confirm('Hapus jadwal ini?'))return;const d=await api(`/api/schedules/${id}`,{method:'DELETE'});if(d.success){showToast('Jadwal dihapus');loadSchedule()}}
+
+// ── DEADLINES ──
+async function loadDeadlines(){
+  const d=await api('/api/deadlines');
+  if(!d.success)return;
+  allDeadlines=d.deadlines;
+  // update stats
+  const now=new Date();
+  const total=allDeadlines.length;
+  const overdue=allDeadlines.filter(x=>x.status==='active'&&new Date(x.due_date)<now).length;
+  const week=allDeadlines.filter(x=>{const days=getDaysUntil(x.due_date);return x.status==='active'&&days>=0&&days<=7}).length;
+  const done=allDeadlines.filter(x=>x.status==='completed').length;
+  document.getElementById('dl-total').textContent=total;
+  document.getElementById('dl-overdue').textContent=overdue;
+  document.getElementById('dl-week').textContent=week;
+  document.getElementById('dl-done').textContent=done;
+  renderDeadlines();
+}
+function renderDeadlines(){
+  let items=[...allDeadlines];
+  const now=new Date();
+  if(dlFilter==='active')items=items.filter(d=>d.status==='active');
+  if(dlFilter==='overdue')items=items.filter(d=>d.status==='active'&&new Date(d.due_date)<now);
+  if(dlFilter==='completed')items=items.filter(d=>d.status==='completed');
+  const c=document.getElementById('deadlines-container');
+  if(!items.length){c.innerHTML='<div class="empty-state"><h3>Tidak ada deadline</h3><p>Klik "+ Deadline Baru" untuk tambah</p></div>';return}
+  const pl={low:'Rendah',medium:'Sedang',high:'Tinggi'};
+  c.innerHTML=items.map(d=>{
+    const days=getDaysUntil(d.due_date);
+    const isOver=d.status==='active'&&days<0;
+    const urgCls=isOver?'urgency-overdue':days<=1?'urgency-soon':days<=7?'urgency-upcoming':'urgency-far';
+    const urgLabel=d.status==='completed'?'✅ Selesai':isOver?`Terlambat ${Math.abs(days)} hari`:days===0?'⚡ Hari ini!':days===1?'⚠️ Besok':`${days} hari lagi`;
+    const statusBadge=d.status==='completed'?'s-done':isOver?'s-overdue':'s-active';
+    const statusLabel=d.status==='completed'?'Selesai':isOver?'Terlewat':'Aktif';
+    return`<div class="deadline-card dl-${d.priority}">
+      <div class="task-top">
+        <div style="flex:1">
+          <div class="deadline-urgency ${urgCls}">${urgLabel}</div>
+          <div class="task-title">${d.title}</div>
+        </div>
+      <div class="task-acts">
+        ${d.status !== 'completed' ? `<button class="act-btn act-done" onclick="completeDeadline(${d.id})" title="Tandai Selesai">✅</button>` : ''}
+        <button class="act-btn act-edit" onclick="openDeadlineModal(${d.id})">✏️</button>
+        <button class="act-btn act-del" onclick="deleteDeadline(${d.id})">🗑</button>
+      </div>
+      </div>
+      ${d.description?`<div class="task-desc">${d.description}</div>`:''}
+      <div class="task-meta">
+        <span class="badge p-${d.priority}">${pl[d.priority]}</span>
+        <span class="badge ${statusBadge}">${statusLabel}</span>
+        <span class="badge" style="background:rgba(96,165,250,.12);color:var(--blue)">${d.category}</span>
+        <span class="due">📅 ${fmtDate(d.due_date)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setDlFilter(f,btn){dlFilter=f;btn.closest('.filter-group').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDeadlines()}
+function openDeadlineModal(id){
+  document.getElementById('dl-modal-ttl').textContent=id?'Edit Deadline':'Deadline Baru';
+  document.getElementById('dl-edit-id').value=id||'';
+  if(id){const d=allDeadlines.find(x=>x.id===id);if(d){document.getElementById('dl-title').value=d.title;document.getElementById('dl-desc').value=d.description||'';document.getElementById('dl-date').value=d.due_date;document.getElementById('dl-category').value=d.category||'Umum';document.getElementById('dl-priority').value=d.priority;document.getElementById('dl-status').value=d.status}}
+  else{document.getElementById('dl-title').value='';document.getElementById('dl-desc').value='';document.getElementById('dl-date').value='';document.getElementById('dl-category').value='Tugas';document.getElementById('dl-priority').value='medium';document.getElementById('dl-status').value='active'}
+  document.getElementById('deadline-modal').classList.add('open');
+}
+async function saveDeadline(){
+  const id=document.getElementById('dl-edit-id').value;
+  const body={title:document.getElementById('dl-title').value,description:document.getElementById('dl-desc').value,due_date:document.getElementById('dl-date').value,category:document.getElementById('dl-category').value,priority:document.getElementById('dl-priority').value,status:document.getElementById('dl-status').value};
+  if(!body.title||!body.due_date)return showToast('Judul dan tanggal wajib diisi!','error');
+  const d=id?await api(`/api/deadlines/${id}`,{method:'PUT',body}):await api('/api/deadlines',{method:'POST',body});
+  if(d.success){closeModal('deadline-modal');showToast(id?'Deadline diperbarui!':'Deadline ditambahkan!');loadDeadlines()}else showToast(d.message,'error');
+}
+async function deleteDeadline(id){if(!confirm('Hapus deadline ini?'))return;const d=await api(`/api/deadlines/${id}`,{method:'DELETE'});if(d.success){showToast('Deadline dihapus');loadDeadlines()}}
+// COMPLETE DEADLINE
+async function completeDeadline(id) {
+  const d = allDeadlines.find(x => x.id === id);
+  if (!d) return;
+  const body = {
+    title: d.title,
+    description: d.description,
+    due_date: d.due_date,
+    category: d.category,
+    priority: d.priority,
+    status: 'completed'
+  };
+  const res = await api(`/api/deadlines/${id}`, { method: 'PUT', body });
+  if (res.success) {
+    showToast('Deadline ditandai selesai! ✅');
+    await loadDeadlines();
+  } else {
+    showToast('Gagal mengupdate deadline', 'error');
+  }
+}
+// ── FINANCE ──
+function setFinanceType(type,btn){
+  financeType=type;document.getElementById('fin-type').value=type;
+  document.querySelectorAll('#finance-modal .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // update category options
+  const sel=document.getElementById('fin-category');
+  const incCats=['Uang Saku','Gaji/Freelance','Beasiswa','Lainnya'];
+  const expCats=['Makan & Minum','Transportasi','Pendidikan','Hiburan','Belanja','Kesehatan','Kos/Kontrakan','Lainnya'];
+  const cats=type==='income'?incCats:expCats;
+  sel.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+}
+async function loadFinanceSummary(){
+  const yrSel=document.getElementById('finance-year');
+  const yr=yrSel?yrSel.value:new Date().getFullYear();
+  const d=await api(`/api/finance/summary?year=${yr}`);
+  if(!d.success)return;
+  const t=d.totals,inc=t.total_income||0,exp=t.total_expense||0,bal=inc-exp;
+  document.getElementById('f-income').textContent=fmtRp(inc);
+  document.getElementById('f-expense').textContent=fmtRp(exp);
+  const balEl=document.getElementById('f-balance');balEl.textContent=(bal<0?'-':'')+fmtRp(bal);balEl.className=`stat-value ${bal>=0?'balance-positive':'balance-negative'}`;
+  renderMonthlyChart(d.monthly);renderCategoryChart(d.categories);
+}
+function renderMonthlyChart(monthly){
+  if(monthlyChart){monthlyChart.destroy();monthlyChart=null}
+  const ctx=document.getElementById('monthly-chart').getContext('2d');
+  const labels=MONTHS;const inc=new Array(12).fill(0);const exp=new Array(12).fill(0);
+  monthly.forEach(m=>{const i=parseInt(m.month)-1;inc[i]=m.income||0;exp[i]=m.expense||0});
+  monthlyChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[
+    {label:'Pemasukan',data:inc,backgroundColor:'rgba(52,211,153,.65)',borderRadius:5},
+    {label:'Pengeluaran',data:exp,backgroundColor:'rgba(248,113,113,.65)',borderRadius:5}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b6b80',font:{size:11}}}},scales:{x:{ticks:{color:'#6b6b80',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#6b6b80',font:{size:10},callback:v=>'Rp'+v.toLocaleString('id-ID')},grid:{color:'rgba(255,255,255,.04)'}}}}});
+}
+
+function setTxMonth(month, btn) {
+  document.querySelectorAll('.tx-month-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // update hidden input kalau masih ada, atau langsung load
+  const yr = document.getElementById('finance-year')?.value || new Date().getFullYear();
+  let url = '/api/finance';
+  if (month) url += `?month=${month}&year=${yr}`;
+  api(url).then(d => {
+    if (d.success) { allTransactions = d.transactions; renderTransactions(); }
+  });
+}
+function renderCategoryChart(categories){
+  if(categoryChart){categoryChart.destroy();categoryChart=null}
+  const expenses=categories.filter(c=>c.type==='expense').slice(0,8);
+  if(!expenses.length)return;
+  const ctx=document.getElementById('category-chart').getContext('2d');
+  const bgColors=['rgba(124,92,252,.7)','rgba(248,113,113,.7)','rgba(251,191,36,.7)','rgba(52,211,153,.7)','rgba(96,165,250,.7)','rgba(251,146,60,.7)','rgba(244,114,182,.7)','rgba(107,107,128,.7)'];
+  categoryChart=new Chart(ctx,{type:'doughnut',data:{labels:expenses.map(c=>c.category),datasets:[{data:expenses.map(c=>c.total),backgroundColor:bgColors,borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#6b6b80',font:{size:10},boxWidth:10}}}}});
+}
+async function loadTransactions(){
+  const month=document.getElementById('tx-month')?.value||'';
+  const yr=document.getElementById('finance-year')?.value||new Date().getFullYear();
+  let url='/api/finance';
+  if(month)url+=`?month=${month}&year=${yr}`;
+  const d=await api(url);if(!d.success)return;
+  allTransactions=d.transactions;renderTransactions();
+}
+function renderTransactions() {
+  const list = document.getElementById('tx-list');
+  if (!allTransactions.length) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:50px 20px;color:var(--muted)">
+        <div style="font-size:2.5rem;margin-bottom:12px">💸</div>
+        <div style="font-size:.9rem;font-weight:500">Belum ada transaksi</div>
+        <div style="font-size:.78rem;margin-top:4px">Tambah transaksi pertamamu!</div>
+      </div>`;
+    return;
+  }
+
+  // Group by date
+  const groups = {};
+  allTransactions.forEach(t => {
+    const date = t.date;
+    if (!groups[date]) groups[date] = [];
+    groups[date].push(t);
+  });
+
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+  const catIcons = {
+    'Uang Saku': '👛', 'Gaji/Freelance': '💼', 'Beasiswa': '🎓',
+    'Makan & Minum': '🍜', 'Transportasi': '🚗', 'Pendidikan': '📚',
+    'Hiburan': '🎮', 'Belanja': '🛍️', 'Kesehatan': '💊',
+    'Kos/Kontrakan': '🏠', 'Lainnya': '📦'
+  };
+
+  list.innerHTML = Object.entries(groups).map(([date, txs]) => {
+    const dateObj = new Date(date);
+    let dateLabel;
+    if (date === today) dateLabel = 'Hari Ini';
+    else if (date === yesterday) dateLabel = 'Kemarin';
+    else dateLabel = dateObj.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    const dayIncome = txs.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+    const dayExpense = txs.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
+
+    return `
+      <div class="tx-group">
+        <div class="tx-group-header">
+          <span class="tx-group-date">${dateLabel}</span>
+          <div class="tx-group-summary">
+            ${dayIncome > 0 ? `<span class="tx-summary-inc">+${fmtRp(dayIncome)}</span>` : ''}
+            ${dayExpense > 0 ? `<span class="tx-summary-exp">-${fmtRp(dayExpense)}</span>` : ''}
+          </div>
+        </div>
+        ${txs.map(t => `
+          <div class="tx-row">
+            <div class="tx-row-icon ${t.type}">
+              ${catIcons[t.category] || '💳'}
+            </div>
+            <div class="tx-row-info">
+              <div class="tx-row-title">${t.description || t.category}</div>
+              <div class="tx-row-cat">${t.category}</div>
+            </div>
+            <div class="tx-row-right">
+              <div class="tx-row-amount ${t.type}">
+                ${t.type === 'income' ? '+' : '-'}${fmtRp(t.amount)}
+              </div>
+              <button class="tx-row-del" onclick="deleteTransaction(${t.id})">✕</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }).join('');
+}
+function openFinanceModal(){
+  document.getElementById('fin-amount').value='';document.getElementById('fin-desc').value='';
+  document.getElementById('fin-date').value=new Date().toISOString().split('T')[0];
+  setFinanceType('income',document.getElementById('type-income-btn'));
+  document.getElementById('finance-modal').classList.add('open');
+}
+async function saveFinance(){
+  const body={type:document.getElementById('fin-type').value,amount:document.getElementById('fin-amount').value,category:document.getElementById('fin-category').value,description:document.getElementById('fin-desc').value,date:document.getElementById('fin-date').value};
+  if(!body.amount||!body.date)return showToast('Jumlah dan tanggal wajib diisi!','error');
+  const d=await api('/api/finance',{method:'POST',body});
+  if(d.success){closeModal('finance-modal');showToast('Transaksi disimpan!');loadFinanceSummary();loadTransactions()}else showToast(d.message,'error');
+}
+async function deleteTransaction(id){if(!confirm('Hapus transaksi ini?'))return;const d=await api(`/api/finance/${id}`,{method:'DELETE'});if(d.success){showToast('Transaksi dihapus');loadFinanceSummary();loadTransactions()}}
+
+// ── NOTES ──
+let allNotes = [];
+
+async function loadNotes() {
+  const d = await api('/api/notes');
+  if (d.success) { allNotes = d.notes; renderNotes(); }
+}
+
+function renderNotes() {
+  const search = document.getElementById('note-search')?.value.toLowerCase() || '';
+  let notes = [...allNotes];
+  if (search) notes = notes.filter(n => n.title.toLowerCase().includes(search) || (n.content||'').toLowerCase().includes(search));
+  const c = document.getElementById('notes-container');
+  if (!notes.length) {
+    c.innerHTML = `<div class="empty-state"><h3>${search ? 'Catatan tidak ditemukan' : 'Belum ada catatan'}</h3><p>${search ? 'Coba kata kunci lain' : 'Klik "+ Catatan Baru" untuk mulai'}</p></div>`;
+    return;
+  }
+  c.innerHTML = notes.map(n => `
+    <div class="note-card" onclick="openNoteModal(${n.id})" style="--note-color:${n.color||'#7c5cfc'}">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${n.color||'#7c5cfc'}"></div>
+      <div class="task-acts" style="position:absolute;top:12px;right:12px">
+        <button class="act-btn act-del" onclick="event.stopPropagation();deleteNote(${n.id})">🗑</button>
+      </div>
+      <div class="note-card-title">${n.title}</div>
+      <div class="note-card-content">${n.content || '<span style="font-style:italic;opacity:.5">Tidak ada isi</span>'}</div>
+      <div class="note-card-footer">
+        <span class="note-date">✏️ ${new Date(n.updated_at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openNoteModal(id) {
+  document.getElementById('note-modal-ttl').textContent = id ? 'Edit Catatan' : 'Catatan Baru';
+  document.getElementById('note-edit-id').value = id || '';
+  buildNoteColorPicker(id ? (allNotes.find(n=>n.id===id)?.color || '#7c5cfc') : '#7c5cfc');
+  if (id) {
+    const n = allNotes.find(x => x.id === id);
+    if (n) { document.getElementById('note-title').value = n.title; document.getElementById('note-content').value = n.content || ''; }
+  } else {
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-content').value = '';
+  }
+  document.getElementById('note-modal').classList.add('open');
+}
+
+function buildNoteColorPicker(sel) {
+  const cp = document.getElementById('note-color-picker');
+  cp.innerHTML = COLORS.map(c => `<div class="color-dot ${c===sel?'selected':''}" style="background:${c}" onclick="selectNoteColor('${c}',this)"></div>`).join('');
+  selectedColor = sel;
+}
+
+function selectNoteColor(color, el) {
+  selectedColor = color;
+  document.querySelectorAll('#note-color-picker .color-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function saveNote() {
+  const id = document.getElementById('note-edit-id').value;
+  const body = { title: document.getElementById('note-title').value, content: document.getElementById('note-content').value, color: selectedColor };
+  if (!body.title) return showToast('Judul wajib diisi!', 'error');
+  const d = id ? await api(`/api/notes/${id}`, {method:'PUT', body}) : await api('/api/notes', {method:'POST', body});
+  if (d.success) { closeModal('note-modal'); showToast(id ? 'Catatan diperbarui!' : 'Catatan disimpan!'); loadNotes(); }
+}
+
+async function deleteNote(id) {
+  if (!confirm('Hapus catatan ini?')) return;
+  const d = await api(`/api/notes/${id}`, {method:'DELETE'});
+  if (d.success) { showToast('Catatan dihapus'); loadNotes(); }
+}
+// ── ADMIN ──
+async function loadAdminStats(){const d=await api('/api/admin/stats');if(!d.success)return;const s=d.stats;document.getElementById('a-users').textContent=s.totalUsers;document.getElementById('a-tasks').textContent=s.totalTasks;document.getElementById('a-done').textContent=s.tasksDone;document.getElementById('a-prog').textContent=s.tasksProgress;document.getElementById('a-todo').textContent=s.tasksTodo;document.getElementById('a-new').textContent=s.newUsersWeek}
+async function loadAdminUsers(){const d=await api('/api/admin/users');if(!d.success)return;document.getElementById('u-count').textContent=`${d.users.length} user`;const b=document.getElementById('users-body');if(!d.users.length){b.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:36px">Belum ada user</td></tr>';return}b.innerHTML=d.users.map(u=>`<tr><td><div style="font-weight:500">${u.name}</div></td><td><div class="td-sub">${u.email}</div></td><td><span class="badge s-${u.task_count>0?'in_progress':'todo'}">${u.task_count} tugas</span></td><td><div class="td-sub">${fmtDate(u.created_at)}</div></td><td><button class="icon-btn icon-btn-danger" onclick="deleteUser(${u.id},'${u.name}')">🗑 Hapus</button></td></tr>`).join('')}
+async function deleteUser(id,name){if(!confirm(`Hapus user "${name}" beserta semua datanya?`))return;const d=await api(`/api/admin/users/${id}`,{method:'DELETE'});if(d.success){showToast(`User ${name} dihapus`);loadAdminUsers();loadAdminStats()}}
+async function loadAdminTasks(){const d=await api('/api/admin/tasks');if(!d.success)return;document.getElementById('at-count').textContent=`${d.tasks.length} tugas`;const b=document.getElementById('all-tasks-body');const pl={low:'Rendah',medium:'Sedang',high:'Tinggi'},sl={todo:'Belum Mulai',in_progress:'Berjalan',done:'Selesai'};if(!d.tasks.length){b.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:36px">Belum ada tugas</td></tr>';return}b.innerHTML=d.tasks.map(t=>`<tr><td><div style="font-weight:500">${t.title}</div></td><td><div>${t.user_name}</div><div class="td-sub">${t.user_email}</div></td><td><span class="badge p-${t.priority}">${pl[t.priority]}</span></td><td><span class="badge s-${t.status}">${sl[t.status]}</span></td><td><div class="td-sub">${fmtDate(t.created_at)}</div></td><td><button class="icon-btn icon-btn-danger" onclick="deleteAdminTask(${t.id})">🗑</button></td></tr>`).join('')}
+async function deleteAdminTask(id){if(!confirm('Hapus tugas ini?'))return;const d=await api(`/api/admin/tasks/${id}`,{method:'DELETE'});if(d.success){showToast('Tugas dihapus');loadAdminTasks();loadAdminStats()}}
+
+// init year selector
+function initYearSelector(){const sel=document.getElementById('finance-year');if(!sel)return;const y=new Date().getFullYear();for(let i=y;i>=y-3;i--){const o=document.createElement('option');o.value=i;o.textContent=i;sel.appendChild(o)}}
+
+// modal overlay close
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+// ── PROFILE & SETTINGS ──
+function toggleDropdown() {
+  const btn = document.getElementById('profile-btn');
+  const dd = document.getElementById('profile-dropdown');
+  btn.classList.toggle('open');
+  dd.classList.toggle('open');
+}
+
+// tutup dropdown kalau klik di luar
+document.addEventListener('click', function(e) {
+  const btn = document.getElementById('profile-btn');
+  if (btn && !btn.contains(e.target)) {
+    btn.classList.remove('open');
+    document.getElementById('profile-dropdown').classList.remove('open');
+  }
+});
+
+function openProfileModal() {
+  if (!currentUser) return;
+  const isAdmin = currentUser.role === 'admin';
+  const av = document.getElementById('pm-avatar');
+  av.textContent = currentUser.name[0].toUpperCase();
+  av.className = `profile-modal-avatar ${isAdmin ? 'admin-av' : ''}`;
+  document.getElementById('pm-name').textContent = currentUser.name;
+  document.getElementById('pm-role').textContent = isAdmin ? '⭐ Administrator' : '🎓 Mahasiswa';
+  document.getElementById('pm-info-name').textContent = currentUser.name;
+  document.getElementById('pm-info-email').textContent = currentUser.email || '—';
+  document.getElementById('pm-info-role').textContent = isAdmin ? 'Administrator' : 'User';
+  document.getElementById('pm-old-pass').value = '';
+  document.getElementById('pm-new-pass').value = '';
+  closeDropdown();
+  document.getElementById('profile-modal').classList.add('open');
+}
+
+function openSettingsModal() {
+  // load saved settings
+  const autorefresh = localStorage.getItem('autorefresh') === 'true';
+  const notif = localStorage.getItem('notif') === 'true';
+  document.getElementById('refresh-toggle').className = `toggle-switch ${autorefresh ? 'on' : ''}`;
+  document.getElementById('notif-toggle').className = `toggle-switch ${notif ? 'on' : ''}`;
+  closeDropdown();
+  document.getElementById('settings-modal').classList.add('open');
+}
+
+function closeDropdown() {
+  document.getElementById('profile-btn')?.classList.remove('open');
+  document.getElementById('profile-dropdown')?.classList.remove('open');
+}
+
+async function changePassword() {
+  const oldPass = document.getElementById('pm-old-pass').value;
+  const newPass = document.getElementById('pm-new-pass').value;
+  if (!oldPass || !newPass) return showToast('Isi password lama dan baru!', 'error');
+  if (newPass.length < 6) return showToast('Password baru minimal 6 karakter!', 'error');
+  const d = await api('/api/auth/change-password', {
+    method: 'POST',
+    body: { oldPassword: oldPass, newPassword: newPass }
+  });
+  if (d.success) {
+    showToast('Password berhasil diubah!');
+    document.getElementById('pm-old-pass').value = '';
+    document.getElementById('pm-new-pass').value = '';
+    closeModal('profile-modal');
+  } else {
+    showToast(d.message || 'Gagal mengubah password', 'error');
+  }
+}
+
+function toggleDarkMode() {
+  showToast('Mode gelap selalu aktif 🌙');
+}
+
+function toggleSetting(toggleId, key) {
+  const el = document.getElementById(toggleId);
+  const isOn = el.classList.toggle('on');
+  localStorage.setItem(key, isOn);
+  if (key === 'autorefresh') {
+    if (isOn) {
+      autoRefreshInterval = setInterval(() => {
+        if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
+      }, 30000);
+      showToast('Auto refresh aktif');
+    } else {
+      clearInterval(autoRefreshInterval);
+      showToast('Auto refresh dimatikan');
+    }
+  }
+  if (key === 'notif') showToast(isOn ? 'Notifikasi deadline aktif 🔔' : 'Notifikasi dimatikan');
+}
+
+let autoRefreshInterval = null;
+
+// ── INIT ──
+(async()=>{
+  initYearSelector();
+  const d=await api('/api/auth/me');
+  if(d.success)enterApp(d.user);
+})();
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  autoRefreshInterval = setInterval(() => {
+    const dashPage = document.getElementById('page-dashboard');
+    if (dashPage && dashPage.classList.contains('active') && currentUser && currentUser.role !== 'admin') {
+      loadDashboard();
+    }
+  }, 30000); // 30 detik
+}
+
+function stopAutoRefresh() {
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+  }
+}
+</script>
+</body>
+</html>
