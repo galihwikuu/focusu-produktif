@@ -5,15 +5,18 @@ const path = require('path');
 const { getDb } = require('./db');
 
 const app = express();
-const PORT = 3000;
 
 app.use(express.json());
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: true,
   credentials: true
 }));
+
 app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(session({
   secret: 'taskapp-secret-2024',
   resave: false,
@@ -30,17 +33,10 @@ app.use('/api/finance', require('./routes/finance'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/admin', require('./routes/admin'));
 
-
-app.get('/{*path}', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-async function start() {
-  await getDb();
-  app.listen(PORT, () => {
-    console.log(`\n🚀 TaskFlow berjalan di http://localhost:${PORT}`);
-    console.log('🔑 Admin: admin / admin123\n');
-  });
-}
+getDb();
 
-start();
+module.exports = app;
