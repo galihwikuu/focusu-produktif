@@ -39,6 +39,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-getDb();
+(async () => {
+  try {
+    await getDb();
+    console.log('✅ Database connected');
+  } catch (err) {
+    console.error('❌ DB ERROR:', err);
+  }
+})();
 
 module.exports = app;
+
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+});
