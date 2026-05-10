@@ -5,6 +5,7 @@ const path = require('path');
 const { getDb } = require('./db');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -16,17 +17,17 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use(session({
-//   secret: 'taskapp-secret-2024',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: {
-//     secure: false,
-//     httpOnly: true,
-//     sameSite: 'lax',
-//     maxAge: 7 * 24 * 60 * 60 * 1000
-//   }
-// }));
+app.use(session({
+  secret: 'taskapp-secret-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  }
+}));
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));
@@ -41,16 +42,20 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-(async () => {
+async function start() {
   try {
     await getDb();
-    console.log('✅ Database connected');
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
   } catch (err) {
     console.error('❌ DB ERROR:', err);
   }
-})();
+}
 
-module.exports = app;
+start();
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err);
