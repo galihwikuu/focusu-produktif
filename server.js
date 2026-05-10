@@ -16,17 +16,17 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({
-  secret: 'taskapp-secret-2024',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false,
-    httpOnly: true,
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  }
-}));
+// app.use(session({
+//   secret: 'taskapp-secret-2024',
+//   resave: false,
+//   saveUninitialized: false,
+//   cookie: {
+//     secure: false,
+//     httpOnly: true,
+//     sameSite: 'lax',
+//     maxAge: 7 * 24 * 60 * 60 * 1000
+//   }
+// }));
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));
