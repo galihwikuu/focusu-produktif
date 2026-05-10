@@ -7,6 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#7c5cfc">
 </head>
 <body>
 <!-- AUTH -->
@@ -1227,6 +1229,14 @@ function stopAutoRefresh() {
     clearInterval(autoRefreshInterval);
     autoRefreshInterval = null;
   }
+}
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('SW registered'));
 }
 </script>
 </body>
