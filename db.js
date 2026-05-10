@@ -1,4 +1,4 @@
-const initSqlJs = require('sql.js/dist/sql-wasm.js');
+const initSqlJs = require('sql.js');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
@@ -8,10 +8,8 @@ let db;
 
 async function getDb() {
   if (db) return db;
-  const SQL = await initSqlJs({
-    locateFile: file =>
-      `https://sql.js.org/dist/${file}`
-  });
+
+  const SQL = await initSqlJs();
 
   if (fs.existsSync(DB_PATH)) {
     const data = fs.readFileSync(DB_PATH);
