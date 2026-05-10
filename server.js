@@ -38,6 +38,10 @@ app.use('/api/finance', require('./routes/finance'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/admin', require('./routes/admin'));
 
+app.get('/', (req, res) => {
+  res.send('Railway berhasil 🚀');
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
