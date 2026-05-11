@@ -247,9 +247,15 @@
       <div class="finance-layout">
         <div class="finance-left">
           <div class="chart-card">
-            <h3>Grafik Bulanan <div class="month-selector"><select id="finance-year" onchange="loadFinanceSummary()"></select></div></h3>
-            <div class="chart-wrap"><canvas id="monthly-chart"></canvas></div>
-          </div>
+            <h3>Grafik Bulanan <div class="month-selector-chip">
+              <button class="chip-btn" onclick="toggleYearDropdown()">
+                <span id="year-display">2024</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="5 8 8 11 11 8"></polyline>
+                </svg>
+              </button>
+              <div class="year-dropdown" id="year-dropdown"></div>
+            </div>
           <div class="chart-card">
             <h3>Pengeluaran per Kategori</h3>
             <div class="chart-wrap" style="height:200px"><canvas id="category-chart"></canvas></div>
@@ -1230,6 +1236,63 @@ function stopAutoRefresh() {
     autoRefreshInterval = null;
   }
 }
+function toggleYearDropdown() {
+  const dropdown = document.getElementById('year-dropdown');
+  const btn = event.target.closest('.chip-btn');
+  
+  dropdown.classList.toggle('show');
+  btn.classList.toggle('active');
+  
+  // Populate dropdown jika kosong
+  if (dropdown.children.length === 0) {
+    populateYearDropdown();
+  }
+}
+
+function populateYearDropdown() {
+  const dropdown = document.getElementById('year-dropdown');
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear - 5;
+  const endYear = currentYear + 2;
+  const selectedYear = document.getElementById('year-display').textContent;
+  
+  for (let year = endYear; year >= startYear; year--) {
+    const option = document.createElement('div');
+    option.className = 'year-option' + (year.toString() === selectedYear ? ' selected' : '');
+    option.textContent = year;
+    option.onclick = () => selectYear(year);
+    dropdown.appendChild(option);
+  }
+}
+
+function selectYear(year) {
+  document.getElementById('year-display').textContent = year;
+  document.getElementById('finance-year').value = year; // Update hidden select
+  
+  // Update styling
+  document.querySelectorAll('.year-option').forEach(opt => {
+    opt.classList.remove('selected');
+    if (opt.textContent === year.toString()) {
+      opt.classList.add('selected');
+    }
+  });
+  
+  // Close dropdown
+  document.getElementById('year-dropdown').classList.remove('show');
+  document.querySelector('.chip-btn').classList.remove('active');
+  
+  // Trigger change event
+  loadFinanceSummary();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.month-selector-chip')) {
+    document.getElementById('year-dropdown').classList.remove('show');
+    document.querySelector('.chip-btn').classList.remove('active');
+  }
+});
+
 </script>
 
 

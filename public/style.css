@@ -1170,3 +1170,89 @@ tr:hover td{background:rgba(255,255,255,.02)}
 }
 
 
+/* month selector */
+/* Month Selector Chip */
+.month-selector-chip {
+  position: relative;
+  display: inline-block;
+}
+
+.chip-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(124,92,252,.1), rgba(124,92,252,.05));
+  border: 1.5px solid rgba(124,92,252,.3);
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.chip-btn:hover {
+  background: linear-gradient(135deg, rgba(124,92,252,.15), rgba(124,92,252,.1));
+  border-color: rgba(124,92,252,.5);
+  transform: translateY(-1px);
+}
+
+.chip-btn:active {
+  transform: translateY(0);
+}
+
+.chip-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.chip-btn.active svg {
+  transform: rotate(180deg);
+}
+
+.year-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.1);
+  min-width: 120px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.year-dropdown.show {
+  max-height: 300px;
+  opacity: 1;
+}
+
+.year-option {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.year-option:last-child {
+  border-bottom: none;
+}
+
+.year-option:hover {
+  background: rgba(124,92,252,.08);
+  color: #7c5cfc;
+  padding-left: 20px;
+}
+
+.year-option.selected {
+  background: rgba(124,92,252,.15);
+  color: #7c5cfc;
+  font-weight: 600;
+}
